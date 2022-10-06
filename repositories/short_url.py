@@ -1,23 +1,18 @@
 import asyncio
-from fastapi import Request, Response, responses, status, HTTPException
+from fastapi import Request, Response, responses, status
 from sqlalchemy.orm import Session
-from .. import models, schemas
-from ..utils import (
-    check_short_url,
-    short_url as short_url_fn,
-    check_original_url,
-)
+from database import utils, models, schemas
 
 
 async def create_short_url(req: Request, res: Response, db: Session):
     if not req.short_url:
-        req.short_url = await short_url_fn(
+        req.short_url = await utils.short_url(
             req.original_url, db
         )  # if short url is not sent from user, it generates random short url
 
     # creating task for runnig both task concurrently
-    task1 = asyncio.create_task(check_original_url(req.original_url, db))
-    task2 = asyncio.create_task(check_short_url(req.short_url, db))
+    task1 = asyncio.create_task(utils.check_original_url(req.original_url, db))
+    task2 = asyncio.create_task(utils.check_short_url(req.short_url, db))
     exist_original = await task1
     exist_short = await task2
 
@@ -42,9 +37,7 @@ async def create_short_url(req: Request, res: Response, db: Session):
 
 async def redirecting_url(params, db):
     url_info: schemas.URLShortern = (
-        db.query(models.ShortURL)
-        .filter(models.ShortURL.short_url == params)
-        .first()
+        db.query(models.ShortURL).filter(models.ShortURL.short_url == params).first()
     )
     if not url_info:
         print(url_info)

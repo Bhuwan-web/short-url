@@ -21,27 +21,21 @@ async def short_url(url: str, db):
 
     exist_short = await check_short_url(short_url, db)
 
-    # check if the url already exist by chance
     if exist_short:
-        # re generate different  random value if generated value already exists
         return await short_url(url, db)
 
     return short_url
 
 
 async def check_original_url(original_url, db):
-    url = db.query(models.ShortURL).filter(
-        models.ShortURL.original_url == original_url
-    )
+    url = db.query(models.ShortURL).filter(models.ShortURL.original_url == original_url)
     if url.first():
         return url.first()
     return None
 
 
 async def check_short_url(short_url, db):
-    url = db.query(models.ShortURL).filter(
-        models.ShortURL.short_url == short_url
-    )
+    url = db.query(models.ShortURL).filter(models.ShortURL.short_url == short_url)
     if url.first():
         raise HTTPException(
             detail={"error": "This short url is already taken"},

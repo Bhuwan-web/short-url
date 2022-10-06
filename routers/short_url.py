@@ -1,9 +1,8 @@
 import asyncio
-from fastapi import APIRouter, Response, status, Depends, responses
+from fastapi import APIRouter, Response, status, Depends
 from sqlalchemy.orm import Session
-from .. import schemas, database, models
-
-from ..repositories import short_url
+from repositories import short_url
+from database import database, schemas
 
 get_db = database.get_db
 router = APIRouter(tags=["Short URL"])

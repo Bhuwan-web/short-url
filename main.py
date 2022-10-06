@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from . import database
-
-from .routers import short_url
+from routers import short_url
+from database import database
 
 get_db = database.get_db
 
